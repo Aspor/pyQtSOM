@@ -1,5 +1,7 @@
 # pyQtSOM
-Simple self organizing map and Qt gui for it
+Simple self organizing map and Qt gui for it.
+
+Run python pyQtSOM.py
 
 Suports saving and loading trained network for laiter viewing.
 
