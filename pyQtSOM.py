@@ -85,7 +85,8 @@ class PyQtSOM (  ):
     def loadTrainingData(self):
         """Opens- QFileDialog for loading training data from file"""
         file=QFileDialog.getOpenFileName(self.ui,
-                                    "Select file containing training data")
+                "Select file containing training data",'.',("Spreadsheets \
+                (*.ods *.xls *xlsx  *.csv *.csvz *.tsv *svz *.gnumeric)"))
         self.ui.trainingDataLoader.readFile(file[0])
     
 
