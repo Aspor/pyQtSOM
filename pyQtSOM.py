@@ -160,8 +160,8 @@ class PyQtSOM (  ):
         columnCount=len(data[0])
         fillTableWidget(data,self.ui.trainingData)
         self.ui.trainPropList.clear()
-        self.createTrainPropertyBox(columnCount,header)
-        self.createNearestDialog(columnCount,headers[1:])            
+        self.ui.createTrainPropertyBox(columnCount,header)
+        self.ui.createNearestDialog(columnCount,headers[1:])            
         if(newNetwork):
             self.ui.networkInitDialog.open()
     
