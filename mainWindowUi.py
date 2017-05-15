@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_mainwindow.ui'
 #
-# Created: Thu Jun 30 13:57:25 2016
+# Created: Wed Jan 25 16:31:00 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -98,8 +98,11 @@ class Ui_MainWindow(object):
         self.actionDrawUMatrix = QtGui.QAction(MainWindow)
         self.actionDrawUMatrix.setCheckable(True)
         self.actionDrawUMatrix.setObjectName("actionDrawUMatrix")
+        self.actionWriteImage = QtGui.QAction(MainWindow)
+        self.actionWriteImage.setObjectName("actionWriteImage")
         self.menu_File.addAction(self.actionSave)
         self.menu_File.addAction(self.actionLoad)
+        self.menu_File.addAction(self.actionWriteImage)
         self.menu_File.addAction(self.actionQuit)
         self.menuShow.addAction(self.actionTrainingData)
         self.menuBar.addAction(self.menu_File.menuAction())
@@ -136,4 +139,5 @@ class Ui_MainWindow(object):
         self.actionTrainingData.setText(QtGui.QApplication.translate("MainWindow", "TrainingData", None, QtGui.QApplication.UnicodeUTF8))
         self.actionNewNetwork.setText(QtGui.QApplication.translate("MainWindow", "New network", None, QtGui.QApplication.UnicodeUTF8))
         self.actionDrawUMatrix.setText(QtGui.QApplication.translate("MainWindow", "Draw U-Matrix", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionWriteImage.setText(QtGui.QApplication.translate("MainWindow", "WriteImage", None, QtGui.QApplication.UnicodeUTF8))
 

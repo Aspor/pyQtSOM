@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'trainingDataWindow.ui'
 #
-# Created: Fri Jun 24 12:31:42 2016
+# Created: Wed May 10 15:25:48 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -45,7 +45,7 @@ class Ui_trainingDataWin(object):
         QtCore.QMetaObject.connectSlotsByName(trainingDataWin)
 
     def retranslateUi(self, trainingDataWin):
-        trainingDataWin.setWindowTitle(QtGui.QApplication.translate("trainingDataWin", "Trainind data", None, QtGui.QApplication.UnicodeUTF8))
+        trainingDataWin.setWindowTitle(QtGui.QApplication.translate("trainingDataWin", "Training data", None, QtGui.QApplication.UnicodeUTF8))
         self.menuLoad.setTitle(QtGui.QApplication.translate("trainingDataWin", "File", None, QtGui.QApplication.UnicodeUTF8))
         self.actionLoad.setText(QtGui.QApplication.translate("trainingDataWin", "Load data", None, QtGui.QApplication.UnicodeUTF8))
         self.actionQuit.setText(QtGui.QApplication.translate("trainingDataWin", "Close", None, QtGui.QApplication.UnicodeUTF8))

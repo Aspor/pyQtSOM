@@ -5,6 +5,7 @@ import pyexcel
 
 import trainingDataLoaderUi
 import trainingDataWindowUi
+import trainingDialogUi
 import mainWindowUi
 import SOMDialogUi
 
@@ -44,7 +45,7 @@ class UI (QMainWindow):
         self.trainingDataUi = trainingDataWindowUi.Ui_trainingDataWin() 
         self.ui.trainWindow=QMainWindow()
         self.trainingDataUi.setupUi(self.ui.trainWindow)       
-         
+                  
         self.networkInitialiserUi=SOMDialogUi.Ui_SomInit()
         self.ui.networkInitDialog=QDialog(self)
         self.networkInitialiserUi.setupUi(self.ui.networkInitDialog)
@@ -57,7 +58,7 @@ class UI (QMainWindow):
 
         #Create nearest select dialog
         self.nearDialog=self.createNearestSelectDialog(data) 
-        #Create train dialog
+        #Create train dialog        
         self.trainingDialog = self.createTrainingDialog()
         
         self.Som=self.ui.Som
@@ -78,6 +79,8 @@ class UI (QMainWindow):
         self.propertyLabel=self.ui.propertyLabel      
         self.trainWindow=self.ui.trainWindow
         self.actionDrawUMatrix=self.ui.actionDrawUMatrix
+        self.actionWriteImage=self.ui.actionWriteImage
+        
         
         
     def createNearestSelectDialog(self,data):
@@ -108,6 +111,25 @@ class UI (QMainWindow):
         self.trainSpinBox.setMaximum(1000000)
         self.trainSpinBox.setMinimum(200)
         self.trainSpinBox.setValue(500)
+        self.trainLabel=QLabel(trainDialog)
+        self.trainLabel.setText("Iterations")
+
+        self.trainSpeedSpinBox=QDoubleSpinBox(trainDialog)
+        self.trainSpeedSpinBox.setMaximum(2)
+        self.trainSpeedSpinBox.setMinimum(0)
+        self.trainSpeedSpinBox.setValue(0.5)
+        self.trainSpeedSpinBox.setSingleStep(0.05)
+        self.speedLabel=QLabel(trainDialog)        
+        self.speedLabel.setText("Trainig speed")
+        
+        self.trainNeigborhood=QSpinBox(trainDialog)
+        self.trainNeigborhood.setMaximum(100 )
+        self.trainNeigborhood.setMinimum(0)
+        self.trainNeigborhood.setValue(4)  
+        self.neigborhoodLabel=QLabel(trainDialog)
+        self.neigborhoodLabel.setText("Neighborhood size")
+        
+        
         self.trainPropBox=QWidget(trainDialog) 
         self.trainPropBoxLayot=QHBoxLayout(self.trainPropBox)
         self.trainPropList=[]
@@ -116,7 +138,16 @@ class UI (QMainWindow):
                                       | QDialogButtonBox.Cancel ,
                                       parent=trainDialog)    
         trainLayout.addWidget(self.trainPropBox)
+
+        trainLayout.addWidget(self.trainLabel)
         trainLayout.addWidget(self.trainSpinBox)
+
+        trainLayout.addWidget(self.speedLabel)
+        trainLayout.addWidget(self.trainSpeedSpinBox)
+        
+        trainLayout.addWidget(self.neigborhoodLabel)
+        trainLayout.addWidget(self.trainNeigborhood)
+        
         trainLayout.addWidget(self.trainButtons)                              
         self.trainButtons.accepted.connect(trainDialog.accept)
         self.trainButtons.rejected.connect(trainDialog.reject)                              
@@ -124,7 +155,7 @@ class UI (QMainWindow):
 
          
     def createTrainPropertyBox(self, dataSize, header=False):
-        """Clears properties from train dialgo and adds new ones"""
+        """Clears properties from train dialog and adds new ones"""
         while self.trainPropBoxLayot.count()>0:
             item=self.trainPropBoxLayot.takeAt(0)
             if not item:

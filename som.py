@@ -5,43 +5,49 @@ import numpy as np
 import time
 
 class SOM(object):
-    
     def __init__(self, vectorSize=0, width=25, height=25, trainingSpeed=0.5):
-        self.dataSize=vectorSize
-        self.width=width
-        self.height=height
-        self.map=[[[0]*vectorSize]*height]*width
-        self.map=np.zeros((width,height,vectorSize))
-        print (self.map.shape)
-        self.trainingSpeed=trainingSpeed
-        
+        self.dataSize = vectorSize
+        self.width = width
+        self.height = height
+        self.map = [[[0]*vectorSize]*height]*width
+        self.map = np.zeros((width, height, vectorSize))
+        print (self.map.shape,"INIT")
+        self.trainingSpeed = trainingSpeed
+
         #Properties used for training
-        self.trainIndexes=[]        
+        self.trainIndexes = []
+
+    def train(self, trainingData = [[]],iteratons=1000,trainingSpeed=0.5,neigborhoodSize=3):
+#        self.batchTrain(trainingData,150,5)
     
-    def train(self, trainingData=[[]],iteratons=1000):
+        trainingData=normalize(trainingData)
+        self.trainingSpeed=trainingSpeed        
         """Selects nodes randomly from training data and adjust map with it"""
         for i in range (iteratons):
             time.sleep(0.00001)
             ind=randint(0,len(trainingData)-1)
             neighbor=self.nearestNeigbor(trainingData[ind])
-            self.adjustNet(np.array(trainingData[ind]), neighbor[0], 
-                                    neighbor[1],self.trainingSpeed)
-            #trainig speed slows with every iteration. 
+            self.adjustNet(np.array(trainingData[ind]), neighbor[0],
+                                    neighbor[1],self.trainingSpeed,neigborhoodSize )
+            #trainig speed slows with every iteration.
             self.trainingSpeed=self.trainingSpeed*0.999 
-    def adjustNet(self, data,BMU_i, BMU_j,trainingSpeed):
+            
+        print("Trained")
+    
+    def adjustNet(self, data,BMU_i, BMU_j,trainingSpeed, neigborhoodSize):
         """Finds adjusts hit node and its neighbours """
         
         #Cast target data to numpy arary for vector operations
         data=np.array(data)
     
-        for ind in inRange(BMU_i,BMU_j,2):
-            if((ind[0]>=0)and(ind[1]>=0) and 
+        for ind in inRange(BMU_i,BMU_j,neigborhoodSize ):
+            if((ind[0]>=0)and(ind[1]>=0) and
               (ind[0]<self.width) and (ind[1]<self.height)):
                     node= np.array(self.map[ind[0]][ind[1]])
                     #futher node is from the winner, less we change its values                    
-                    distCor=  0.5/(1+abs(BMU_i-ind[0])) + 0.5/(1+ abs(BMU_j-ind[1]))  
+                    weight= gaussian([BMU_i,BMU_j],ind, neigborhoodSize  )
                     self.map[ind[0]][ind[1]]= (node +  trainingSpeed 
-                                            *(data - node)*distCor)
+                                            *(data - node)*weight)
                          
     def nearestNeigbor(self, dataPoint=[]):
         """Finds closest match to data Point"""
@@ -79,6 +85,8 @@ class SOM(object):
     def randomize(self,trainingData):
         """Randomizes network with values between maximun
             and minimun values from training data"""
+        trainingData=normalize(trainingData)            
+            
         netMax=np.max(trainingData,axis=0)
         netMin=np.min(trainingData,axis=0)
         for col in self.map:
@@ -106,10 +114,13 @@ class SOM(object):
         f=open(file,'r')
         lines=f.readlines()
         shape=lines[0].split(',')              
+        #self.width=int(shape[0][1:])
+        #self.height=int(shape[1])
         self.width=int(shape[0][1:])
         self.height=int(shape[1])
+        
         self.dataSize=int(shape[2][:-2])
-        self.map=np.zeros((self.height,self.width,self.dataSize))
+        self.map=np.zeros((self.width,self.height,self.dataSize))
 
         for i, line in enumerate(lines[1:]):
             dataVec=line.split()
@@ -118,8 +129,55 @@ class SOM(object):
                 tmpStr=n.strip('[ ]')
                 if tmpStr:                
                     node.append(float(tmpStr))                    
-            self.map[int(i/self.width)][i%self.width]=node
-            
+            self.map[int(i/self.height)][i%self.height]=node
+        print(self.map.shape,"LOAD")
+        
+        
+    def batchTrain(self, trainingData,iterations,neighborhoodSize):
+        prototypeSum=np.zeros((self.width,self.height,self.dataSize))
+        size=neighborhoodSize
+        prototypeDiv=np.zeros((self.width,self.height))
+        for t in range(iterations):        
+            for data in trainingData:
+                data=np.array(data)
+                neighb=self.nearestNeigbor(data)
+                for node in inRange(neighb[0],neighb[1],size):
+                    if((node[0]>=0)and(node[1]>=0) and
+                    (node[0]<self.width) and (node[1]<self.height)):
+                        prototypeSum[node[0]][node[1]]+= data*gaussian(node,neighb,size,1)
+                        prototypeDiv[node[0]][node[1]]+=gaussian(node,neighb,size,1)
+            size=neighborhoodSize - int((t/iterations)*neighborhoodSize)
+            for i, column in enumerate(self.map):
+                for j, node in enumerate(column):
+                    for m in range(self.dataSize):
+                        if prototypeDiv[i][j]!=0:
+                            prototypeSum[i][j][m]=prototypeSum[i][j][m]/prototypeDiv[i][j]
+            print(t,iterations, "t,Iter" ,size,neighborhoodSize)
+            self.map=np.array(prototypeSum)
+            prototypeSum=np.zeros((self.width,self.height,self.dataSize))
+            prototypeDiv=np.zeros((self.width,self.height))
+
+
+
+    
+def hexDistance( node1, node2):
+    c1=hexToCube(node1)
+    c2=hexToCube(node2)
+    dist=abs( c1[0]-c2[0])+ abs(c1[1]-c2[1])+abs (c1[2]-c2[2])/2
+    return dist
+    
+def gaussian(pos,center,width=2,height=1):
+    e=np.e
+    c2=2*width**2
+    dist= -(hexDistance(pos,center)**2)
+    return height*e**(dist/c2)
+        
+def hexToCube(node):
+    x=node[0]-(node[1]-node[1]&1)/2;
+    z = node[1]
+    y=-x-z
+    return[x,y,z]
+
 
 def inRange(i,j,dist):
     """Returns list of indexes of nodes in distance away of (i,j)"""
@@ -132,3 +190,16 @@ def inRange(i,j,dist):
             row = int( z + (x + (x&1)) / 2)
             result.append((i+col,j+row))
     return result
+    
+def normalize(data=[[]] ):
+    data=np.array(data)
+    netMax=np.amax(data,axis=(0))
+    netMin=np.amin(data,axis=(0))
+    for i,col in enumerate (data):
+        for j,row in enumerate(col):
+            data[i][j]=1-2/(netMax[j]-netMin[j])*(data[i][j]-netMin[j])
+#    print (data,np.amax(data,axis=(0)),np.amin(data,axis=(0)))
+    return data
+    
+
+     

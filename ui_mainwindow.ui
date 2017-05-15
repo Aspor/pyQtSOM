@@ -106,6 +106,7 @@
     </property>
     <addaction name="actionSave"/>
     <addaction name="actionLoad"/>
+    <addaction name="actionWriteImage"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuShow">
@@ -198,6 +199,11 @@
    </property>
    <property name="text">
     <string>Draw U-Matrix</string>
+   </property>
+  </action>
+  <action name="actionWriteImage">
+   <property name="text">
+    <string>WriteImage</string>
    </property>
   </action>
  </widget>

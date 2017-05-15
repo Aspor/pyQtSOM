@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'SOMdialogBox.ui'
 #
-# Created: Fri Jun 24 12:32:28 2016
+# Created: Wed May 10 14:02:49 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -24,18 +24,12 @@ class Ui_SomInit(object):
         self.gridLayout = QtGui.QGridLayout(self.layoutWidget)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
+        self.label = QtGui.QLabel(self.layoutWidget)
+        self.label.setObjectName("label")
+        self.gridLayout.addWidget(self.label, 0, 1, 1, 1)
         self.label_2 = QtGui.QLabel(self.layoutWidget)
         self.label_2.setObjectName("label_2")
         self.gridLayout.addWidget(self.label_2, 1, 1, 1, 1)
-        self.trainSpeedSB = QtGui.QDoubleSpinBox(self.layoutWidget)
-        self.trainSpeedSB.setMaximum(2.0)
-        self.trainSpeedSB.setSingleStep(0.01)
-        self.trainSpeedSB.setProperty("value", 0.5)
-        self.trainSpeedSB.setObjectName("trainSpeedSB")
-        self.gridLayout.addWidget(self.trainSpeedSB, 2, 0, 1, 1)
-        self.label_3 = QtGui.QLabel(self.layoutWidget)
-        self.label_3.setObjectName("label_3")
-        self.gridLayout.addWidget(self.label_3, 2, 1, 1, 1)
         self.heightSB = QtGui.QSpinBox(self.layoutWidget)
         self.heightSB.setMinimum(10)
         self.heightSB.setMaximum(250)
@@ -48,9 +42,6 @@ class Ui_SomInit(object):
         self.widthSB.setProperty("value", 25)
         self.widthSB.setObjectName("widthSB")
         self.gridLayout.addWidget(self.widthSB, 0, 0, 1, 1)
-        self.label = QtGui.QLabel(self.layoutWidget)
-        self.label.setObjectName("label")
-        self.gridLayout.addWidget(self.label, 0, 1, 1, 1)
 
         self.retranslateUi(SomInit)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), SomInit.accept)
@@ -59,7 +50,6 @@ class Ui_SomInit(object):
 
     def retranslateUi(self, SomInit):
         SomInit.setWindowTitle(QtGui.QApplication.translate("SomInit", "Init SOM", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_2.setText(QtGui.QApplication.translate("SomInit", "Height", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_3.setText(QtGui.QApplication.translate("SomInit", "Training speed", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("SomInit", "Width", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("SomInit", "Height", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setText(QtGui.QApplication.translate("SomInit", "Width", None, QtGui.QApplication.UnicodeUTF8))
 

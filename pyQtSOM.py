@@ -3,12 +3,11 @@ Main module, handles communication between GUI and SOM
 """
 from PySide.QtCore import *
 from PySide.QtGui import *
-
 import sys
 import _thread
 from sklearn.datasets.samples_generator import make_blobs
 #from sklearn import datasets
-
+import som
 from som import SOM
 from GUI import UI
 from SOMVisualizer import SOMVisualizer
@@ -27,8 +26,11 @@ class PyQtSOM (  ):
                  [5,4,3,2,1]
                  ]
         data, labels_true = make_blobs(n_samples=300,n_features=5, 
-                                       centers=centers, cluster_std=1,
-                                       random_state=0)    
+                                       centers=centers, cluster_std=0.3,
+                                       random_state=0)   
+        data=som.normalize(data)
+                              
+                                       
         self.ui=UI(data) #Ui object creates GUI for aplication
         fillTableWidget(data,self.ui.trainingData)         
         self.som=SOM(vectorSize=len(data[0]),width=25,height=25)
@@ -60,17 +62,22 @@ class PyQtSOM (  ):
         self.ui.actionNewNetwork.triggered.connect(
                                 self.ui.networkInitDialog.open)
         self.ui.networkInitDialog.accepted.connect(self.initNetwork)
-        self.ui.trainButtons.accepted.connect(lambda: 
-                                self.train(self.ui.trainSpinBox.value(),data))  
+        self.ui.trainButtons.accepted.connect(
+        lambda:self.train(self.ui.trainSpinBox.value(),data,
+                          self.ui.trainSpeedSpinBox.value(),
+                        self.ui.trainNeigborhood.value() ))  
                             
         self.ui.actionDrawUMatrix.triggered.connect(
                                 self.ui.SOMWidget.generateUMatrix)
+
+        self.ui.actionWriteImage.triggered.connect(self.ui.SOMWidget.save)                                
+        
         self.updatePropLabel()
 
     def __del__ ( self ):
         self.ui = None
  
-    def train(self, iterations, trainingData):
+    def train(self, iterations, trainingData,trainingSpeed,neigborHood):
         """Gets indexes of training properties 
             and starts SOM training in new thread """
         ind=[]
@@ -79,7 +86,7 @@ class PyQtSOM (  ):
                 ind.append(i)
         data=self.getTrainingData()
         self.som.setTrainIndexes(ind)
-        _thread.start_new_thread( self.som.train,(data,iterations))
+        _thread.start_new_thread( self.som.train,(data,iterations,trainingSpeed,neigborHood))
         self.ui.SOMWidget.repaint()
         
     def loadTrainingData(self):
@@ -158,6 +165,7 @@ class PyQtSOM (  ):
             self.ui.trainingData.setHorizontalHeaderLabels(headers)
 
         columnCount=len(data[0])
+        data=som.normalize(data)
         fillTableWidget(data,self.ui.trainingData)
         self.ui.trainPropList.clear()
         self.ui.createTrainPropertyBox(columnCount,header)
@@ -209,6 +217,7 @@ class PyQtSOM (  ):
         """Opens QFileDialog and calls SOMs load function"""
         file=QFileDialog.getOpenFileName(self.ui,"Select file")
         self.som.load(file[0])
+        
     
     #Change propertylabels text
     def updatePropLabel(self):
@@ -229,9 +238,9 @@ class PyQtSOM (  ):
         """Inits SOM with values from networkInitDialog"""
         w=self.ui.networkInitialiserUi.widthSB.value()
         h=self.ui.networkInitialiserUi.heightSB.value()
-        ts=self.ui.networkInitialiserUi.trainSpeedSB.value()                
+        #ts=self.ui.networkInitialiserUi.trainSpeedSB.value()                
         self.som.__init__(vectorSize=self.ui.trainingData.columnCount(), 
-                          width=w, height=h,trainingSpeed=ts)
+                          width=w, height=h)
                        
         data=self.getTrainingData()
         self.som.randomize(data)
