@@ -1,10 +1,9 @@
 """
 Main module, handles communication between GUI and SOM
 """
-from PySide.QtCore import *
-from PySide.QtGui import *
+from PySide2 import QtCore, QtWidgets, QtGui
+from PySide2.QtCore import Slot
 import sys
-import _thread
 from sklearn.datasets.samples_generator import make_blobs
 #from sklearn import datasets
 import som
@@ -28,18 +27,16 @@ class PyQtSOM (  ):
         data, labels_true = make_blobs(n_samples=300,n_features=5, 
                                        centers=centers, cluster_std=0.3,
                                        random_state=0)   
-        data=som.normalize(data)
-                              
-                                       
+        #data=som.normalize(data)
+           
         self.ui=UI(data) #Ui object creates GUI for aplication
         fillTableWidget(data,self.ui.trainingData)         
         self.som=SOM(vectorSize=len(data[0]),width=25,height=25)
         
         #Randomize SOM with minimun and maximum values taken from training data
-        self.som.randomize(data)
+        #self.som.randomize()
         self.ui.SOMWidget=SOMVisualizer(window=self.ui.Som,
                                             train=data,som=self.som)  
-
               
         #Connect signals to slots
         self.ui.nearDialog.rejected.connect(self.ui.SOMWidget.toggleNearest)
@@ -66,13 +63,16 @@ class PyQtSOM (  ):
         lambda:self.train(self.ui.trainSpinBox.value(),data,
                           self.ui.trainSpeedSpinBox.value(),
                         self.ui.trainNeigborhood.value() ))  
-                            
         self.ui.actionDrawUMatrix.triggered.connect(
                                 self.ui.SOMWidget.generateUMatrix)
 
         self.ui.actionWriteImage.triggered.connect(self.ui.SOMWidget.save)                                
         
+        self.ui.trainingModeChooser.currentIndexChanged.connect(self.som.changeTrainingMode)
+        self.som.trainingDone.connect(self.trainigFinished)
+        
         self.updatePropLabel()
+        
 
     def __del__ ( self ):
         self.ui = None
@@ -80,18 +80,28 @@ class PyQtSOM (  ):
     def train(self, iterations, trainingData,trainingSpeed,neigborHood):
         """Gets indexes of training properties 
             and starts SOM training in new thread """
+        print("train call")
+
         ind=[]
         for i, checkBox in enumerate( self.ui.trainPropList):
             if checkBox.isChecked():
                 ind.append(i)
         data=self.getTrainingData()
         self.som.setTrainIndexes(ind)
-        _thread.start_new_thread( self.som.train,(data,iterations,trainingSpeed,neigborHood))
-        self.ui.SOMWidget.repaint()
-        
+        self.ui.ui.actionTrain.setText("STOP");
+
+        self.ui.actionTrain.triggered.disconnect(self.ui.trainingDialog.show)    
+        self.ui.actionTrain.triggered.connect(self.som.stopTraining)        
+        print("init training")
+        self.som.train(data,iterations,trainingSpeed,neigborHood)
+        print("start training")
+        self.som.start()
+
+        #self.som.train(data,iterations,trainingSpeed,neigborHood)
+
     def loadTrainingData(self):
         """Opens- QFileDialog for loading training data from file"""
-        file=QFileDialog.getOpenFileName(self.ui,
+        file=QtWidgets.QFileDialog.getOpenFileName(self.ui,
                 "Select file containing training data",'.',("Spreadsheets \
                 (*.ods *.xls *xlsx  *.csv *.csvz *.tsv *svz *.gnumeric)"))
         self.ui.trainingDataLoader.readFile(file[0])
@@ -167,7 +177,7 @@ class PyQtSOM (  ):
         columnCount=len(data[0])
         data=som.normalize(data)
         fillTableWidget(data,self.ui.trainingData)
-        self.ui.trainPropList.clear()
+        self.ui.trainPropList[:]=[] #.clear()
         self.ui.createTrainPropertyBox(columnCount,header)
         self.ui.createNearestDialog(columnCount,headers[1:])            
         if(newNetwork):
@@ -211,11 +221,11 @@ class PyQtSOM (  ):
  
     def saveNetwork(self):
         """Opens QFileDialog and calls SOMs save function"""
-        file=QFileDialog.getSaveFileName(self.ui,"Select target file")
+        file=QtWidgets.QFileDialog.getSaveFileName(self.ui,"Select target file")
         self.som.save(file[0])
     def loadNetwork(self):
         """Opens QFileDialog and calls SOMs load function"""
-        file=QFileDialog.getOpenFileName(self.ui,"Select file")
+        file=QtWidgets.QFileDialog.getOpenFileName(self.ui,"Select file")
         self.som.load(file[0])
         
     
@@ -232,18 +242,17 @@ class PyQtSOM (  ):
         else:
             label += item.text()
         self.ui.propertyLabel.setText(label)
-        
-        
+
     def initNetwork(self):
         """Inits SOM with values from networkInitDialog"""
         w=self.ui.networkInitialiserUi.widthSB.value()
         h=self.ui.networkInitialiserUi.heightSB.value()
         #ts=self.ui.networkInitialiserUi.trainSpeedSB.value()                
-        self.som.__init__(vectorSize=self.ui.trainingData.columnCount(), 
+        self.som.init(vectorSize=self.ui.trainingData.columnCount(), 
                           width=w, height=h)
                        
         data=self.getTrainingData()
-        self.som.randomize(data)
+        self.som.randomize()
     
     def getTrainingData(self):
         """Return 2d data array generated from QTableWidget"""
@@ -253,7 +262,15 @@ class PyQtSOM (  ):
             for j in range(self.ui.trainingData.columnCount()):
                 data[i].append(float( self.ui.trainingData.item(i,j).text()))
         return data
+    
+    @Slot()
+    def trainigFinished(self):
+        self.ui.ui.actionTrain.setText("Train");
+        try: self.ui.actionTrain.triggered.disconnect(self.som.stopTraining)
+        except Exception: pass
 
+        self.ui.actionTrain.triggered.connect(self.ui.trainingDialog.show)
+        
 def isNumber(s):
     """Checks if s is number"""
     if s is None:
@@ -270,7 +287,7 @@ def fillTableWidget(array,widget):
     widget.setColumnCount(len(array[0]))
     for i, row in enumerate(array):
         for j, col in enumerate(row):
-            widget.setItem(i,j,QTableWidgetItem(str(col)))
+            widget.setItem(i,j, QtWidgets.QTableWidgetItem(str(col)))
     return widget
 
 #Remove table rows that are shorter than longest row to remove jaggedness
@@ -288,7 +305,14 @@ def stripTable(table):
     
 if __name__ == '__main__':
     # create application
-    app = QApplication( sys.argv )
+    
+    if isinstance(QtGui.qApp, type(None)):
+        app = QtWidgets.QApplication(sys.argv)
+    else:
+        app = QtGui.qApp
+
+    
+    #app = QtWidgets.QApplication( sys.argv )
     app.setApplicationName( 'python SOM' )
     # create widget
     w = PyQtSOM()
@@ -296,8 +320,11 @@ if __name__ == '__main__':
     w.ui.show()
     w.ui.SOMWidget.repaint()
     # connection
-    QObject.connect( app, SIGNAL('lastWindowClosed()'), app, SLOT('quit()'))
+    #QtCore.QObject.connect( app, QtCore.SIGNAL('lastWindowClosed()'), app, QtCore.SLOT('quit()'))
     # execute application
     sys.exit( app.exec_() )
+    
+
+
     
     

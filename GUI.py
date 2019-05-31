@@ -1,6 +1,7 @@
 """Module for graphical user interface"""
-from PySide.QtGui import *
-from PySide.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtCore import *
+from PySide2.QtWidgets import *
 import pyexcel
 
 import trainingDataLoaderUi
@@ -129,6 +130,10 @@ class UI (QMainWindow):
         self.neigborhoodLabel=QLabel(trainDialog)
         self.neigborhoodLabel.setText("Neighborhood size")
         
+        self.trainingModeChooser = QComboBox(trainDialog)
+        self.trainingModeChooser.addItem("Normal")
+        self.trainingModeChooser.addItem("Batch")
+        self.trainingModeChooser.currentIndexChanged.connect(self.trainingModeChanged)
         
         self.trainPropBox=QWidget(trainDialog) 
         self.trainPropBoxLayot=QHBoxLayout(self.trainPropBox)
@@ -148,11 +153,30 @@ class UI (QMainWindow):
         trainLayout.addWidget(self.neigborhoodLabel)
         trainLayout.addWidget(self.trainNeigborhood)
         
+        trainLayout.addWidget(self.trainingModeChooser)
+        
         trainLayout.addWidget(self.trainButtons)                              
         self.trainButtons.accepted.connect(trainDialog.accept)
         self.trainButtons.rejected.connect(trainDialog.reject)                              
         return trainDialog 
-
+  
+    @Slot()
+    def trainingModeChanged(self, index):
+        if index==0:
+            self.trainSpinBox.setMaximum(1000000)
+            self.trainSpinBox.setMinimum(200)
+            self.trainSpinBox.setValue(500)
+            self.trainNeigborhood.setMaximum(100 )
+            self.trainNeigborhood.setMinimum(0)
+            self.trainNeigborhood.setValue(4)
+        elif index==1:
+            self.trainSpinBox.setMaximum(10000)
+            self.trainSpinBox.setMinimum(10)
+            self.trainSpinBox.setValue(100)
+            self.trainNeigborhood.setMaximum(100 )
+            self.trainNeigborhood.setMinimum(0)
+            self.trainNeigborhood.setValue(3)  
+            
          
     def createTrainPropertyBox(self, dataSize, header=False):
         """Clears properties from train dialog and adds new ones"""

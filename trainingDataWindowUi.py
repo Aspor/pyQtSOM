@@ -1,40 +1,41 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'trainingDataWindow.ui'
+# Form implementation generated from reading ui file 'trainingDataWindow.ui',
+# licensing of 'trainingDataWindow.ui' applies.
 #
-# Created: Wed May 10 15:25:48 2017
-#      by: pyside-uic 0.2.15 running on PySide 1.2.4
+# Created: Tue May 21 15:55:08 2019
+#      by: pyside2-uic  running on PySide2 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide import QtCore, QtGui
+from PySide2 import QtCore, QtGui, QtWidgets
 
 class Ui_trainingDataWin(object):
     def setupUi(self, trainingDataWin):
         trainingDataWin.setObjectName("trainingDataWin")
         trainingDataWin.resize(800, 600)
-        self.centralwidget = QtGui.QWidget(trainingDataWin)
+        self.centralwidget = QtWidgets.QWidget(trainingDataWin)
         self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout = QtGui.QGridLayout(self.centralwidget)
+        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
-        self.trainingData = QtGui.QTableWidget(self.centralwidget)
+        self.trainingData = QtWidgets.QTableWidget(self.centralwidget)
         self.trainingData.setObjectName("trainingData")
         self.trainingData.setColumnCount(0)
         self.trainingData.setRowCount(0)
         self.gridLayout.addWidget(self.trainingData, 0, 0, 1, 1)
         trainingDataWin.setCentralWidget(self.centralwidget)
-        self.menubar = QtGui.QMenuBar(trainingDataWin)
+        self.menubar = QtWidgets.QMenuBar(trainingDataWin)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 19))
         self.menubar.setObjectName("menubar")
-        self.menuLoad = QtGui.QMenu(self.menubar)
+        self.menuLoad = QtWidgets.QMenu(self.menubar)
         self.menuLoad.setObjectName("menuLoad")
         trainingDataWin.setMenuBar(self.menubar)
-        self.statusbar = QtGui.QStatusBar(trainingDataWin)
+        self.statusbar = QtWidgets.QStatusBar(trainingDataWin)
         self.statusbar.setObjectName("statusbar")
         trainingDataWin.setStatusBar(self.statusbar)
-        self.actionLoad = QtGui.QAction(trainingDataWin)
+        self.actionLoad = QtWidgets.QAction(trainingDataWin)
         self.actionLoad.setObjectName("actionLoad")
-        self.actionQuit = QtGui.QAction(trainingDataWin)
+        self.actionQuit = QtWidgets.QAction(trainingDataWin)
         self.actionQuit.setObjectName("actionQuit")
         self.menuLoad.addAction(self.actionLoad)
         self.menuLoad.addAction(self.actionQuit)
@@ -45,8 +46,8 @@ class Ui_trainingDataWin(object):
         QtCore.QMetaObject.connectSlotsByName(trainingDataWin)
 
     def retranslateUi(self, trainingDataWin):
-        trainingDataWin.setWindowTitle(QtGui.QApplication.translate("trainingDataWin", "Training data", None, QtGui.QApplication.UnicodeUTF8))
-        self.menuLoad.setTitle(QtGui.QApplication.translate("trainingDataWin", "File", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionLoad.setText(QtGui.QApplication.translate("trainingDataWin", "Load data", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionQuit.setText(QtGui.QApplication.translate("trainingDataWin", "Close", None, QtGui.QApplication.UnicodeUTF8))
+        trainingDataWin.setWindowTitle(QtWidgets.QApplication.translate("trainingDataWin", "Training data", None, -1))
+        self.menuLoad.setTitle(QtWidgets.QApplication.translate("trainingDataWin", "File", None, -1))
+        self.actionLoad.setText(QtWidgets.QApplication.translate("trainingDataWin", "Load data", None, -1))
+        self.actionQuit.setText(QtWidgets.QApplication.translate("trainingDataWin", "Close", None, -1))
 
