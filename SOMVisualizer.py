@@ -166,7 +166,7 @@ class SOMVisualizer(QWidget):
                 path=QPainterPath()
                 path.addPolygon(poly)
                 painter.fillPath(path,brush)
-                painter.drawText( w*i*0.75-12, h*j+i%2*h*0.5+6, str( (i,j) ) )
+                #painter.drawText( w*i*0.75-12, h*j+i%2*h*0.5+6, str( (i,j) ) )
 
                 if(self.nearestBool):
                     path2=QPainterPath()

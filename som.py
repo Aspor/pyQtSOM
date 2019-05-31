@@ -54,7 +54,7 @@ class SOM(QThread):
         self.iteratons = iteratons
         self.trainingSpeed = trainingSpeed
         self.neigborhoodSize=neigborhoodSize
-        self.gaussianArray = [[0]*(neigborhoodSize+1)]*(neigborhoodSize+1)
+        self.gaussianArray = [[0]*(neigborhoodSize+3)]*(neigborhoodSize+3)
                
     def iterativeTrain(self, trainingData = [[]],iteratons=1000,trainingSpeed=0.5,neigborhoodSize=3):
           """Selects nodes randomly from training data and adjust map with it"""
@@ -62,7 +62,7 @@ class SOM(QThread):
               if self.stop:
                   self.stop = False
                   break
-              time.sleep(0.00001)
+              time.sleep(0.0001)
               ind=randint(0,len(trainingData)-1)
               neighbor=self.nearestNeigbor(trainingData[ind],True)
               self.adjustNet(np.array(trainingData[ind]), neighbor[0],
@@ -183,10 +183,12 @@ class SOM(QThread):
                         gaus =self.gaussian(node,neighb,size,1)
                         prototypeSum[node[0]][node[1]]+=data*gaus
                         prototypeDiv[node[0]][node[1]]+=gaus
+                        time.sleep(0.001)
             size=neighborhoodSize - int((t/iterations)*neighborhoodSize)
             for i, column in enumerate(self.map):
                 for j, node in enumerate(column):
                     for m in range(self.dataSize):
+                        time.sleep(0.001)
                         if prototypeDiv[i][j]!=0:
                             prototypeSum[i][j][m]=prototypeSum[i][j][m]/prototypeDiv[i][j]
             print(t,iterations, "t,Iter" ,size,neighborhoodSize)
@@ -208,8 +210,6 @@ class SOM(QThread):
         c2=hexToCube(node2)
         dist=int((abs( c1[0]-c2[0])+ abs(c1[1]-c2[1])+abs (c1[2]-c2[2]))/2)
         self.distArray[node1[0]][node1[1]][node2[0]][node2[1]]=dist
-        
-        print(node1,node2,dist)
         return  dist
         
     def gaussian(self, pos,center,width=2,height=1):
@@ -226,7 +226,6 @@ def hexToCube(node):
     z = node[1]-(node[0]-node[0]&1)/2;
     x = node[0]
     y = -x-z
-    print(x,y,z)
     return[x,y,z]
 
 def inRange(i,j,dist):
